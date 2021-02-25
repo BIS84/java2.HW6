@@ -1,13 +1,14 @@
 package HW6;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class UserInterface {
 
     private final Controller controller = new Controller();
 
-    public void runApplication() throws IOException {
+    public void runApplication() throws SQLException {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Введите название города на английском языке");
@@ -16,7 +17,8 @@ public class UserInterface {
             setGlobalCity(city);
 
             System.out.println("Введите ответ: \n1 - Получить погоду на следующие 5 дней\n" +
-                    "2 - выход (exit) - завершить работу");
+                    "2 - вывести базу данных на экран\n" +
+                    "3 - выход (exit) - завершить работу");
             String result = scanner.nextLine();
 
             checkIsExit(result);
@@ -33,13 +35,13 @@ public class UserInterface {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            MainApp.print5DayWeather();
         }
     }
 
-    private void checkIsExit(String result) {
-        if (result.toLowerCase().equals("2")) {
+    private void checkIsExit(String result) throws SQLException {
+        if (result.equalsIgnoreCase("3")) {
             System.out.println("Завершаю работу");
+            WeatherRepository.closeConnection();
             System.exit(0);
         }
     }
@@ -61,7 +63,7 @@ public class UserInterface {
         }
     }
 
-    private void notifyController(String input) throws IOException {
+    private void notifyController(String input) throws IOException, SQLException {
         controller.onUserInput(input);
     }
 }

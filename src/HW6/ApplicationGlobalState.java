@@ -3,7 +3,8 @@ package HW6;
 public final class ApplicationGlobalState {
 
     private static ApplicationGlobalState INSTANCE;
-    private String selectedCity = null;
+    private static String selectedCity = null;
+    private static String DB_FILENAME = "weather.db";
     private final String API_KEY = "1nrGCocrlgv9fXL10lakH6VO5QTQKZxC";
 
     private ApplicationGlobalState() {
@@ -17,13 +18,15 @@ public final class ApplicationGlobalState {
         return INSTANCE;
     }
 
-    public  String getSelectedCity() {
+    public static String getDbFileName() {
+        return DB_FILENAME;
+    }
+    public static String getSelectedCity() {
         return selectedCity;
     }
 
     public void setSelectedCity(String selectedCity) {
         this.selectedCity = selectedCity;
-//        System.out.println("Это " + selectedCity);
     }
 
     public String getApiKey() {
