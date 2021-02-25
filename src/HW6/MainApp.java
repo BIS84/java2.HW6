@@ -4,10 +4,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
+import java.sql.SQLException;
 
 public class MainApp {
 
-    public static void main(String[] args) throws IOException {
+    public static String city;
+
+    public static void main(String[] args) throws IOException, SQLException {
+
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        WeatherRepository.getConnection();
+        WeatherRepository.createTableIfNotExists();
 
         UserInterface userInterface = new UserInterface();
         userInterface.runApplication();
@@ -76,6 +88,18 @@ public class MainApp {
                                 + " на дату " + navigatingByJsonAsNodeTree(day[m - 1].getPath(), "/Date")
                                 + " ожидается: \"" + navigatingByJsonAsNodeTree("./weather.json", "/Headline/Text")
                                 + "\", температура " + navigatingByJsonAsNodeTree(day[m - 1].getPath(), "/Temperature/Maximum/Value") + "°C");
+                        String date = navigatingByJsonAsNodeTree(day[m - 1].getPath(), "/Date");
+                        String city = ApplicationGlobalState.getInstance().getSelectedCity();
+                        String text = navigatingByJsonAsNodeTree("./weather.json", "/Headline/Text");
+                        Double temperature = Double.parseDouble(navigatingByJsonAsNodeTree(day[m - 1].getPath(), "/Temperature/Maximum/Value"));
+
+                        WeatherData weaterData = new WeatherData(city, date, text, temperature);
+                        try {
+                            boolean b1 = WeatherRepository.saveWeatherData(weaterData);
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+
                     }
                     m++;
                 }

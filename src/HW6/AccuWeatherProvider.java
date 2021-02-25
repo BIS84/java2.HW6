@@ -44,7 +44,6 @@ public class AccuWeatherProvider implements WeatherProvider {
                 .addQueryParameter("metric", "true")
                 .addQueryParameter("Type", "City")
                 .build();
-//        System.out.println(url);
 
         Request requesthttp = new Request.Builder()
                 .addHeader("accept", "application/json")
@@ -52,7 +51,6 @@ public class AccuWeatherProvider implements WeatherProvider {
                 .build();
 
         String jsonResponse = Objects.requireNonNull(client.newCall(requesthttp).execute().body()).string();
-//        System.out.println(jsonResponse);
         File file = new File("./weather.json");
 
         try (OutputStream out = new FileOutputStream("./weather.json")) {
@@ -87,13 +85,17 @@ public class AccuWeatherProvider implements WeatherProvider {
             throw new IOException("Невозможно прочесть информацию о городе. " +
                     "Код ответа сервера = " + response.code() + " тело ответа = " + Objects.requireNonNull(response.body()).string());
         }
-        String jsonResponse = response.body().string();
- //       System.out.println("Произвожу поиск города " + selectedCity);
- //       System.out.println(jsonResponse);
+        String jsonResponse = null;
+        try {
+            jsonResponse = response.body().string();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
         if (objectMapper.readTree(jsonResponse).size() > 0) {
             String cityName = objectMapper.readTree(jsonResponse).get(0).at("/LocalizedName").asText();
             String countryName = objectMapper.readTree(jsonResponse).get(0).at("/Country/LocalizedName").asText();
-//            System.out.println("Найден город " + cityName + " в стране " + countryName);
+
         } else throw new IOException("Server returns 0 cities");
 
         return objectMapper.readTree(jsonResponse).get(0).at("/Key").asText();
